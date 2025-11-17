@@ -116,9 +116,9 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       QrCodeEditView.renderForm(container, this._userItem, hasAttachment);
       QrCodeEditView.attachFormHandlers(
         this.domElement,
-        async (title, firstName, lastName, phoneNumber, company, jobTitle) => {
+        async (phoneNumber) => {
           if (!this._userItem) return;
-          await this._qrCodeService.updateItem(this._userItem.Id, title, firstName, lastName, phoneNumber, company, jobTitle);
+          await this._qrCodeService.updateItem(this._userItem.Id, phoneNumber);
         },
         () => this._switchToHomeView(),
         async () => await this._generateQRCode(),

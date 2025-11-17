@@ -78,17 +78,12 @@ export class QrCodeService {
     }
   }
 
-  public async updateItem(itemId: number, title: string, firstName: string, lastName: string, phoneNumber: string, company: string, jobTitle: string): Promise<boolean> {
+  public async updateItem(itemId: number, phoneNumber: string): Promise<boolean> {
     try {
       const updateUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})`;
       
       const body = JSON.stringify({
-        Title: title,
-        FirstName: firstName,
-        LastName: lastName,
-        PhoneNumber: phoneNumber,
-        Company: company,
-        JobTitle: jobTitle
+        PhoneNumber: phoneNumber
       });
 
       const response: SPHttpClientResponse = await this.spHttpClient.post(

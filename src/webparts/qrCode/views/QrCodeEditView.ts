@@ -9,38 +9,33 @@ export class QrCodeEditView {
       <div class="${styles.formContainer}">
         <form id="qrCodeForm">
           <div class="${styles.formField}">
-            <label for="title">Title: *</label>
-            <input type="text" id="title" name="title" value="${escape(userItem.Title || '')}" required />
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" value="${escape(userItem.FirstName || '')}" readonly />
           </div>
           
           <div class="${styles.formField}">
-            <label for="firstName">First Name: *</label>
-            <input type="text" id="firstName" name="firstName" value="${escape(userItem.FirstName || '')}" required />
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" value="${escape(userItem.LastName || '')}" readonly />
           </div>
           
           <div class="${styles.formField}">
-            <label for="lastName">Last Name: *</label>
-            <input type="text" id="lastName" name="lastName" value="${escape(userItem.LastName || '')}" required />
-          </div>
-          
-          <div class="${styles.formField}">
-            <label for="email">Email: *</label>
+            <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="${escape(userItem.Email || '')}" readonly />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="company">Company:</label>
+            <input type="text" id="company" name="company" value="${escape(userItem.Company || '')}" readonly />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="jobTitle">Job Title:</label>
+            <input type="text" id="jobTitle" name="jobTitle" value="${escape(userItem.JobTitle || '')}" readonly />
           </div>
           
           <div class="${styles.formField}">
             <label for="phoneNumber">Phone Number: *</label>
             <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required />
-          </div>
-          
-          <div class="${styles.formField}">
-            <label for="company">Company:</label>
-            <input type="text" id="company" name="company" value="${escape(userItem.Company || '')}" />
-          </div>
-          
-          <div class="${styles.formField}">
-            <label for="jobTitle">Job Title:</label>
-            <input type="text" id="jobTitle" name="jobTitle" value="${escape(userItem.JobTitle || '')}" />
           </div>
           
           <div class="${styles.formField} ${styles.buttonGroup}">
@@ -87,7 +82,7 @@ export class QrCodeEditView {
 
   public static attachFormHandlers(
     domElement: HTMLElement,
-    onSave: (title: string, firstName: string, lastName: string, phoneNumber: string, company: string, jobTitle: string) => Promise<void>,
+    onSave: (phoneNumber: string) => Promise<void>,
     onClose: () => void,
     onGenerate: () => Promise<void>,
     onDownload: () => void
@@ -107,14 +102,9 @@ export class QrCodeEditView {
         saveButton.disabled = true;
         saveMessage.innerHTML = 'Saving...';
 
-        const titleInput = domElement.querySelector('#title') as HTMLInputElement;
-        const firstNameInput = domElement.querySelector('#firstName') as HTMLInputElement;
-        const lastNameInput = domElement.querySelector('#lastName') as HTMLInputElement;
         const phoneNumberInput = domElement.querySelector('#phoneNumber') as HTMLInputElement;
-        const companyInput = domElement.querySelector('#company') as HTMLInputElement;
-        const jobTitleInput = domElement.querySelector('#jobTitle') as HTMLInputElement;
 
-        await onSave(titleInput.value, firstNameInput.value, lastNameInput.value, phoneNumberInput.value, companyInput.value, jobTitleInput.value);
+        await onSave(phoneNumberInput.value);
 
         saveMessage.innerHTML = '<span style="color: green;">✓ Saved successfully!</span>';
         setTimeout(() => {
