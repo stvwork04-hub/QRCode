@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "qr-code-client-side-solution",
+    "id": "4ee7b585-2019-4e72-b300-09b9687f57bc",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "QRCode description"
+      },
+      "longDescription": {
+        "default": "QRCode description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "qr-code Feature",
+        "description": "The feature that activates elements of the qr-code solution.",
+        "id": "fc0b9bdf-1249-476b-9df0-85a73a913709",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/qr-code.sppkg"
+  }
+}

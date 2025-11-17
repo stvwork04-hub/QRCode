@@ -1,0 +1,240 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+
+.qrCode {
+  overflow: hidden;
+  padding: 1em;
+  color: "[theme:bodyText, default: #323130]";
+  color: var(--bodyText);
+  &.teams {
+    font-family: $ms-font-family-fallbacks;
+  }
+}
+
+.welcome {
+  text-align: center;
+  margin-bottom: 20px;
+  
+  h2 {
+    color: "[theme:themePrimary, default: #0078d4]";
+    color: var(--themePrimary);
+  }
+}
+
+.welcomeImage {
+  width: 100%;
+  max-width: 420px;
+}
+
+.formContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: "[theme:white, default: #ffffff]";
+  border: 1px solid "[theme:neutralLight, default: #edebe9]";
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.formField {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: "[theme:bodyText, default: #323130]";
+  }
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid "[theme:neutralTertiaryAlt, default: #c8c6c4]";
+    border-radius: 2px;
+    font-size: 14px;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: "[theme:themePrimary, default: #0078d4]";
+    }
+
+    &:readonly {
+      background-color: "[theme:neutralLighter, default: #f3f2f1]";
+      cursor: not-allowed;
+    }
+  }
+
+  &.buttonGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+}
+
+.iconButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  min-width: 80px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #106ebe 0%, #004578 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.buttonLabel {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.saveButton {
+  // Inherits from iconButton
+}
+
+.generateButton {
+  // Inherits from iconButton
+}
+
+.downloadButton {
+  // Inherits from iconButton
+}
+
+.closeButton {
+  // Inherits from iconButton
+}
+
+.noRecord {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  background: "[theme:neutralLighter, default: #f3f2f1]";
+  border-radius: 4px;
+
+  p {
+    margin: 10px 0;
+  }
+}
+
+.qrCodeDisplay {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+.qrCodeImageContainer {
+  background: "[theme:white, default: #ffffff]";
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.qrCodeImage {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.personName {
+  font-size: 24px;
+  font-weight: 600;
+  color: "[theme:themePrimary, default: #0078d4]";
+  margin: 20px 0 5px 0;
+}
+
+.personTitle {
+  font-size: 16px;
+  font-weight: 400;
+  color: "[theme:bodyText, default: #323130]";
+  margin: 0 0 20px 0;
+}
+
+.homeButtons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.generatePrompt {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 20px;
+
+  h3 {
+    font-size: 24px;
+    color: "[theme:themePrimary, default: #0078d4]";
+    margin: 20px 0 10px 0;
+  }
+
+  p {
+    font-size: 16px;
+    color: "[theme:bodyText, default: #323130]";
+    margin-bottom: 30px;
+  }
+
+  button {
+    margin: 0 auto;
+  }
+}
+
+.promptIcon {
+  color: "[theme:themePrimary, default: #0078d4]";
+  margin-bottom: 20px;
+
+  svg {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.links {
+  a {
+    text-decoration: none;
+    color: "[theme:link, default:#03787c]";
+    color: var(--link);
+
+    &:hover {
+      text-decoration: underline;
+      color: "[theme:linkHovered, default: #014446]";
+      color: var(--linkHovered);
+    }
+  }
+}

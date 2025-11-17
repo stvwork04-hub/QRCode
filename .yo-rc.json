@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "QRCode",
+    "componentType": "webpart",
+    "template": "none",
+    "componentName": "QRCode",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.19.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "qr-code",
+    "libraryId": "4ee7b585-2019-4e72-b300-09b9687f57bc",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionShortDescription": "QRCode description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false
+  }
+}
