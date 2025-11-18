@@ -12,7 +12,7 @@ export class QrCodeService {
   public async getUserItem(email: string): Promise<IQRCodeItem | null> {
     try {
       // Try exact match first (case-sensitive)
-      let listUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items?$filter=Email eq '${encodeURIComponent(email)}'&$select=Id,Title,FirstName,LastName,Email,PhoneNumber,Company,JobTitle,QRCodeURL,ContactID,AttachmentFiles&$expand=AttachmentFiles`;
+      let listUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items?$filter=Email eq '${encodeURIComponent(email)}'&$select=Id,Title,FirstName,LastName,Email,PhoneNumber,Company,JobTitle,QRCodeURL,ContactID,MobilePhone,Instagram,Facebook,Gmail,OtherPhone,AttachmentFiles&$expand=AttachmentFiles`;
       
       console.log('Fetching data from:', listUrl);
       console.log('User email:', email);
@@ -30,7 +30,7 @@ export class QrCodeService {
         console.log('No exact match found, trying case-insensitive search...');
         
         // Get all items and filter client-side
-        listUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items?$select=Id,Title,FirstName,LastName,Email,PhoneNumber,Company,JobTitle,QRCodeURL,ContactID,AttachmentFiles&$expand=AttachmentFiles`;
+        listUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items?$select=Id,Title,FirstName,LastName,Email,PhoneNumber,Company,JobTitle,QRCodeURL,ContactID,MobilePhone,Instagram,Facebook,Gmail,OtherPhone,AttachmentFiles&$expand=AttachmentFiles`;
         
         response = await this.spHttpClient.get(
           listUrl,
@@ -78,13 +78,11 @@ export class QrCodeService {
     }
   }
 
-  public async updateItem(itemId: number, phoneNumber: string): Promise<boolean> {
+  public async updateItem(itemId: number, updatedFields: Partial<IQRCodeItem>): Promise<boolean> {
     try {
       const updateUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})`;
       
-      const body = JSON.stringify({
-        PhoneNumber: phoneNumber
-      });
+      const body = JSON.stringify(updatedFields);
 
       const response: SPHttpClientResponse = await this.spHttpClient.post(
         updateUrl,

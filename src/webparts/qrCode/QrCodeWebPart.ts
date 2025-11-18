@@ -116,9 +116,17 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       QrCodeEditView.renderForm(container, this._userItem, hasAttachment);
       QrCodeEditView.attachFormHandlers(
         this.domElement,
-        async (phoneNumber) => {
+        async (formData) => {
           if (!this._userItem) return;
-          await this._qrCodeService.updateItem(this._userItem.Id, phoneNumber);
+          await this._qrCodeService.updateItem(this._userItem.Id, formData);
+          
+          // Update the local user item with the new data
+          this._userItem.PhoneNumber = formData.PhoneNumber;
+          if (formData.MobilePhone !== undefined) this._userItem.MobilePhone = formData.MobilePhone;
+          if (formData.Instagram !== undefined) this._userItem.Instagram = formData.Instagram;
+          if (formData.Facebook !== undefined) this._userItem.Facebook = formData.Facebook;
+          if (formData.Gmail !== undefined) this._userItem.Gmail = formData.Gmail;
+          if (formData.OtherPhone !== undefined) this._userItem.OtherPhone = formData.OtherPhone;
         },
         () => this._switchToHomeView(),
         async () => await this._generateQRCode(),

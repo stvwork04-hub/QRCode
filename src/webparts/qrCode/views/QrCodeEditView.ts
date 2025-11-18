@@ -38,6 +38,31 @@ export class QrCodeEditView {
             <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required />
           </div>
           
+          <div class="${styles.formField}">
+            <label for="mobilePhone">Mobile Phone:</label>
+            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="otherPhone">Other Phone:</label>
+            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="instagram">Instagram:</label>
+            <input type="text" id="instagram" name="instagram" value="${escape(userItem.Instagram || '')}" />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="facebook">Facebook:</label>
+            <input type="text" id="facebook" name="facebook" value="${escape(userItem.Facebook || '')}" />
+          </div>
+          
+          <div class="${styles.formField}">
+            <label for="gmail">Gmail:</label>
+            <input type="email" id="gmail" name="gmail" value="${escape(userItem.Gmail || '')}" />
+          </div>
+          
           <div class="${styles.formField} ${styles.buttonGroup}">
             <button type="submit" id="saveButton" class="${styles.iconButton}" title="Save">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -82,7 +107,7 @@ export class QrCodeEditView {
 
   public static attachFormHandlers(
     domElement: HTMLElement,
-    onSave: (phoneNumber: string) => Promise<void>,
+    onSave: (formData: { PhoneNumber: string; MobilePhone?: string; Instagram?: string; Facebook?: string; Gmail?: string; OtherPhone?: string; }) => Promise<void>,
     onClose: () => void,
     onGenerate: () => Promise<void>,
     onDownload: () => void
@@ -103,8 +128,22 @@ export class QrCodeEditView {
         saveMessage.innerHTML = 'Saving...';
 
         const phoneNumberInput = domElement.querySelector('#phoneNumber') as HTMLInputElement;
+        const mobilePhoneInput = domElement.querySelector('#mobilePhone') as HTMLInputElement;
+        const instagramInput = domElement.querySelector('#instagram') as HTMLInputElement;
+        const facebookInput = domElement.querySelector('#facebook') as HTMLInputElement;
+        const gmailInput = domElement.querySelector('#gmail') as HTMLInputElement;
+        const otherPhoneInput = domElement.querySelector('#otherPhone') as HTMLInputElement;
 
-        await onSave(phoneNumberInput.value);
+        const formData = {
+          PhoneNumber: phoneNumberInput.value,
+          MobilePhone: mobilePhoneInput.value || undefined,
+          Instagram: instagramInput.value || undefined,
+          Facebook: facebookInput.value || undefined,
+          Gmail: gmailInput.value || undefined,
+          OtherPhone: otherPhoneInput.value || undefined
+        };
+
+        await onSave(formData);
 
         saveMessage.innerHTML = '<span style="color: green;">✓ Saved successfully!</span>';
         setTimeout(() => {
