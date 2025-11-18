@@ -35,17 +35,17 @@ export class QrCodeEditView {
           
           <div class="${styles.formField}">
             <label for="phoneNumber">Phone Number: *</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
             <label for="mobilePhone">Mobile Phone:</label>
-            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
             <label for="otherPhone">Other Phone:</label>
-            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
@@ -154,9 +154,10 @@ export class QrCodeEditView {
         saveMessage.innerHTML = '';
         
         // Show centered success message
-        saveSuccessMessage.style.display = 'block';
+        const messageElement = saveSuccessMessage;
+        messageElement.style.display = 'block';
         setTimeout(() => {
-          saveSuccessMessage.style.display = 'none';
+          messageElement.style.display = 'none';
         }, 3000);
       } catch (error) {
         saveMessage.innerHTML = `<span style="color: red;">Error saving: ${error}</span>`;
@@ -173,7 +174,7 @@ export class QrCodeEditView {
     const generateQRButton = domElement.querySelector('#generateQRButton');
     if (generateQRButton) {
       generateQRButton.addEventListener('click', () => {
-        void onGenerate();
+        onGenerate().catch(console.error);
       });
     }
 
@@ -189,10 +190,10 @@ export class QrCodeEditView {
       const field = domElement.querySelector(`#${fieldId}`) as HTMLInputElement;
       if (field) {
         // Strict input validation - only allow numbers and basic phone formatting
-        const validatePhoneInput = (input: HTMLInputElement) => {
+        const validatePhoneInput = (input: HTMLInputElement): void => {
           const value = input.value;
           // Allow only digits, spaces, hyphens, parentheses, and plus sign
-          const filteredValue = value.replace(/[^0-9\s\-\(\)\+]/g, '');
+          const filteredValue = value.replace(/[^0-9\s-()+]/g, '');
           if (value !== filteredValue) {
             input.value = filteredValue;
             // Trigger change event to update any bound data
@@ -208,7 +209,7 @@ export class QrCodeEditView {
         // Prevent non-numeric key presses
         field.addEventListener('keypress', (e) => {
           const char = String.fromCharCode(e.which || e.keyCode);
-          const allowedChars = /[0-9\s\-\(\)\+]/;
+          const allowedChars = /[0-9\s-()+]/;
           
           // Allow control keys (backspace, delete, etc.)
           if (e.which === 0 || e.which === 8 || e.which === 9 || e.which === 13 || e.which === 27) {
@@ -226,7 +227,7 @@ export class QrCodeEditView {
           e.preventDefault();
           const clipboardData = e.clipboardData || (window as any).clipboardData;
           const pastedData = clipboardData.getData('text');
-          const filteredData = pastedData.replace(/[^0-9\s\-\(\)\+]/g, '');
+          const filteredData = pastedData.replace(/[^0-9\s-()+]/g, '');
           
           // Insert filtered data at cursor position
           const start = field.selectionStart || 0;

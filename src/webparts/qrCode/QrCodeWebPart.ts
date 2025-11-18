@@ -100,7 +100,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     QrCodeHomeView.renderGeneratePrompt(container);
     QrCodeHomeView.attachGeneratePromptHandlers(
       this.domElement,
-      () => this._switchToEditView()
+      () => this._generateQRCode()
     );
   }
 
@@ -223,7 +223,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
   private async _generateQRCode(): Promise<void> {
     if (!this._userItem) return;
 
-    const generateButton = this.domElement.querySelector('#generateQRButton') as HTMLButtonElement;
+    const generateButton = this.domElement.querySelector('#generateButton') as HTMLButtonElement;
     const saveMessage = this.domElement.querySelector('#saveMessage');
     const successMessage = this.domElement.querySelector('#successMessage') as HTMLElement;
     
@@ -272,13 +272,147 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       const attachments = await this._qrCodeService.getAttachments(this._userItem.Id);
       
       if (attachments.length > 0) {
-        this._qrCodeService.downloadAttachment(attachments[0]);
+        await this._downloadCompressedQRCode(attachments[0]);
       } else {
         alert('No QR Code attachment found for this record.');
       }
     } catch (error) {
       console.error('Error downloading QR Code:', error);
       alert(`Error downloading QR Code: ${error}`);
+    }
+  }
+
+  private async _downloadCompressedQRCode(attachment: any): Promise<void> {
+    try {
+      const fileUrl = `https://tecq8.sharepoint.com/${attachment.ServerRelativeUrl}`;
+      
+      // Check if it's an SVG file
+      const isSVG = attachment.FileName.toLowerCase().endsWith('.svg');
+      
+      if (isSVG) {
+        // Handle SVG conversion to PNG
+        await this._convertSVGToPNG(fileUrl);
+      } else {
+        // Handle regular image compression
+        await this._compressImageToPNG(fileUrl);
+      }
+
+    } catch (error) {
+      console.error('Error processing QR code:', error);
+      // Fall back to original download method
+      this._qrCodeService.downloadAttachment(attachment);
+    }
+  }
+
+  private async _convertSVGToPNG(svgUrl: string): Promise<void> {
+    try {
+      // Fetch the SVG content
+      const response = await fetch(svgUrl);
+      const svgText = await response.text();
+      
+      // Create a blob from SVG text
+      const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+      const svgObjectUrl = URL.createObjectURL(svgBlob);
+      
+      // Create image from SVG
+      const img = new Image();
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Failed to load SVG'));
+        img.src = svgObjectUrl;
+      });
+
+      // Create canvas for conversion
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error('Canvas context not available');
+      }
+
+      // Set target size for PNG (400x400 for good quality but smaller file size)
+      const targetSize = 400;
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      
+      // Set white background for better QR code visibility
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, targetSize, targetSize);
+
+      // Draw SVG image on canvas
+      ctx.drawImage(img, 0, 0, targetSize, targetSize);
+
+      // Convert to PNG blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `QR_Code_${this._userItem?.FirstName || 'User'}.png`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          URL.revokeObjectURL(svgObjectUrl);
+        }
+      }, 'image/png', 0.9); // Higher quality for QR codes
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async _compressImageToPNG(imageUrl: string): Promise<void> {
+    try {
+      // Create a new image to load the QR code
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = imageUrl;
+      });
+
+      // Create canvas for compression
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error('Canvas context not available');
+      }
+
+      // Set smaller dimensions for reduced file size
+      const targetSize = 400;
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      
+      // Set white background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, targetSize, targetSize);
+
+      // Draw image on canvas with reduced size
+      ctx.drawImage(img, 0, 0, targetSize, targetSize);
+
+      // Convert to PNG blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `QR_Code_${this._userItem?.FirstName || 'User'}.png`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png', 0.9);
+
+    } catch (error) {
+      throw error;
     }
   }
 
