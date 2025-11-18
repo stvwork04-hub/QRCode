@@ -2,9 +2,13 @@
 
 .qrCode {
   overflow: hidden;
-  padding: 1em;
+  padding: 2rem;
   color: "[theme:bodyText, default: #323130]";
   color: var(--bodyText);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e0f2f1;
+  min-height: 100vh;
+  
   &.teams {
     font-family: $ms-font-family-fallbacks;
   }
@@ -12,112 +16,247 @@
 
 .welcome {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 2.5rem;
   
   h2 {
-    color: "[theme:themePrimary, default: #0078d4]";
-    color: var(--themePrimary);
+    color: #800020;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(128, 0, 32, 0.1);
   }
 }
 
 .welcomeImage {
   width: 100%;
   max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .formContainer {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background: "[theme:white, default: #ffffff]";
-  border: 1px solid "[theme:neutralLight, default: #edebe9]";
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  width: 95%;
+  margin: 2rem auto;
+  padding: 3rem 3rem 2.5rem 3rem;
+  background: #f6fdfd;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0078d4, #005a9e, #004578);
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+.formContainer {
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 3rem;
+    align-items: start;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    margin: 1rem auto;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 1.5rem 1rem 1rem 1rem;
+    margin: 0.5rem auto;
+    width: 98%;
+  }
 }
 
 .formField {
-  margin-bottom: 15px;
+  margin-bottom: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 62px;
 
   label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
     color: "[theme:bodyText, default: #323130]";
+    text-transform: none;
+    letter-spacing: normal;
+    line-height: 1.4;
+    min-height: 1.2em;
+    padding-left: 0.125rem;
+    padding-left: 0.25rem;
   }
 
   input {
     width: 100%;
-    padding: 8px 12px;
-    border: 1px solid "[theme:neutralTertiaryAlt, default: #c8c6c4]";
-    border-radius: 2px;
-    font-size: 14px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e1e5e9;
+    background: #ffffff;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-family: inherit;
     box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1.4;
+    vertical-align: top;
+    height: 32px;
+    
+    &::placeholder {
+      color: #6c757d;
+    }
 
     &:focus {
       outline: none;
       border-color: "[theme:themePrimary, default: #0078d4]";
+      background: "[theme:white, default: #ffffff]";
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.1);
+      transform: translateY(-1px);
+    }
+
+    &:hover:not(:focus):not(:readonly) {
+      background: #f8f9fa;
+      border-color: #c1c7cd;
     }
 
     &:readonly {
-      background-color: "[theme:neutralLighter, default: #f3f2f1]";
+      background-color: #f1f8ff !important;
+      color: #6c757d !important;
       cursor: not-allowed;
+      border-color: #e9ecef !important;
+      font-style: normal;
+      opacity: 1 !important;
+      
+      &:hover {
+        background-color: #f1f8ff !important;
+        transform: none;
+        border-color: #e9ecef !important;
+      }
+    }
+    
+    &[readonly] {
+      background-color: #f1f8ff !important;
+      color: #6c757d !important;
+      cursor: not-allowed;
+      border-color: #e9ecef !important;
+      font-style: normal;
+      opacity: 1 !important;
+      
+      &:hover {
+        background-color: #f1f8ff !important;
+        transform: none;
+        border-color: #e9ecef !important;
+      }
     }
   }
 
   &.buttonGroup {
+    grid-column: 1 / -1;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+    
+    @media (max-width: 768px) {
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
   }
 }
 
 .iconButton {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 12px 16px;
-  min-width: 80px;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  min-width: 100px;
+  height: 40px;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
   background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
   color: white;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
 
   svg {
     flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
 
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, #106ebe 0%, #004578 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0, 120, 212, 0.3);
+    
+    &::before {
+      left: 100%;
+    }
   }
 
   &:active:not(:disabled) {
-    transform: translateY(0);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 120, 212, 0.2);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
+    background: #6c757d;
   }
 }
 
 .buttonLabel {
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
   text-align: center;
   white-space: nowrap;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .saveButton {
@@ -133,81 +272,134 @@
 }
 
 .closeButton {
-  // Inherits from iconButton
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c82333 0%, #a02622 100%);
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+  }
 }
 
 .noRecord {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 3rem;
   text-align: center;
-  background: "[theme:neutralLighter, default: #f3f2f1]";
-  border-radius: 4px;
+  background: "[theme:white, default: #ffffff]";
+  border-radius: 16px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #ffc107;
 
   p {
-    margin: 10px 0;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    
+    &:first-child {
+      color: #dc3545;
+      font-weight: 600;
+    }
   }
 }
 
 .qrCodeDisplay {
-  max-width: 400px;
+  max-width: 350px;
   margin: 0 auto;
   text-align: center;
-  padding: 20px;
+  padding: 1.5rem;
+  background: #fffef0;
+  border-radius: 16px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f5f3e0;
 }
 
 .qrCodeImageContainer {
   background: "[theme:white, default: #ffffff]";
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+  border: 1px solid #e9ecef;
+  position: relative;
+  max-width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #0078d4, #005a9e, #004578);
+    border-radius: 18px;
+    z-index: -1;
+    opacity: 0.1;
+  }
 }
 
 .qrCodeImage {
-  max-width: 100%;
+  max-width: 200px;
+  width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
+  border-radius: 6px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 .personName {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   color: "[theme:themePrimary, default: #0078d4]";
-  margin: 20px 0 5px 0;
+  margin: 1.5rem 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
 }
 
 .personTitle {
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 1.125rem;
+  font-weight: 500;
   color: "[theme:bodyText, default: #323130]";
-  margin: 0 0 20px 0;
+  margin: 0 0 2rem 0;
+  opacity: 0.8;
 }
 
 .homeButtons {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
 .generatePrompt {
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
   text-align: center;
-  padding: 40px 20px;
+  padding: 3rem 2rem;
+  background: "[theme:white, default: #ffffff]";
+  border-radius: 20px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.1);
 
   h3 {
-    font-size: 24px;
+    font-size: 2rem;
+    font-weight: 700;
     color: "[theme:themePrimary, default: #0078d4]";
-    margin: 20px 0 10px 0;
+    margin: 1.5rem 0 1rem 0;
+    text-shadow: 0 2px 4px rgba(0, 120, 212, 0.1);
   }
 
   p {
-    font-size: 16px;
+    font-size: 1.125rem;
     color: "[theme:bodyText, default: #323130]";
-    margin-bottom: 30px;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    opacity: 0.9;
   }
 
   button {
@@ -217,12 +409,38 @@
 
 .promptIcon {
   color: "[theme:themePrimary, default: #0078d4]";
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 120, 212, 0.2));
+  animation: pulse 2s infinite;
 
   svg {
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
   }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+// High priority readonly input styling
+.formContainer input[readonly],
+.formField input[readonly],
+input[readonly] {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+  color: #6c757d !important;
+  font-style: normal !important;
+  cursor: not-allowed !important;
+  border-color: #e9ecef !important;
+  opacity: 1 !important;
 }
 
 .links {
@@ -237,4 +455,63 @@
       color: var(--linkHovered);
     }
   }
+}
+
+// High priority readonly input styling - ensure no italics and light blue background
+.formContainer input[readonly],
+.formField input[readonly],
+input[readonly],
+input:read-only {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+  color: #6c757d !important;
+  font-style: normal !important;
+  cursor: not-allowed !important;
+  border-color: #e9ecef !important;
+  opacity: 1 !important;
+}
+
+// Additional specific targeting for all readonly fields
+#firstName[readonly],
+#lastName[readonly], 
+#email[readonly],
+#company[readonly],
+#jobTitle[readonly] {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+  color: #6c757d !important;
+  font-style: normal !important;
+  cursor: not-allowed !important;
+  border-color: #e9ecef !important;
+  opacity: 1 !important;
+}
+
+// Ultimate override for readonly styling
+input.readonly,
+input[readonly="readonly"],
+input[readonly="true"] {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+  color: #6c757d !important;
+  font-style: normal !important;
+  cursor: not-allowed !important;
+  border-color: #e9ecef !important;
+  opacity: 1 !important;
+}
+
+// Force all readonly inputs regardless of position or specificity
+input[type="text"][readonly],
+input[type="email"][readonly],
+input[readonly]:not([type="tel"]) {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+}
+
+// Ensure right side readonly fields get proper styling
+.formField:nth-child(even) input[readonly],
+.formField:nth-child(odd) input[readonly] {
+  background-color: #f1f8ff !important;
+  background: #f1f8ff !important;
+  color: #6c757d !important;
+  font-style: normal !important;
 }
