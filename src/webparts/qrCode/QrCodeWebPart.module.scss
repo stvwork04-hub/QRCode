@@ -22,8 +22,58 @@
     color: #800020;
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     text-shadow: 0 1px 2px rgba(128, 0, 32, 0.1);
+  }
+}
+
+.profileImageContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.profileImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 3px solid #ced4da;
+  box-shadow: 0 4px 12px rgba(206, 212, 218, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(206, 212, 218, 0.3);
+  }
+}
+
+.profileImagePlaceholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 3px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  
+  svg {
+    width: 50px;
+    height: 50px;
+    opacity: 0.7;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    border-color: #ced4da;
+    
+    svg {
+      color: #ced4da;
+      opacity: 1;
+    }
   }
 }
 
@@ -190,22 +240,23 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  min-width: 100px;
-  height: 40px;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  min-width: 90px;
+  height: 36px;
   border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
-  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
   color: white;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
   
   &::before {
     content: '';
@@ -214,69 +265,70 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.3s ease;
   }
 
   svg {
     flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    width: 14px;
+    height: 14px;
+    opacity: 0.95;
   }
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #106ebe 0%, #004578 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 32px rgba(0, 120, 212, 0.3);
+    background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.25), 0 2px 4px rgba(0, 0, 0, 0.1);
     
     &::before {
       left: 100%;
     }
+    
+    svg {
+      opacity: 1;
+    }
   }
 
   &:active:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0, 120, 212, 0.2);
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 120, 212, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-    box-shadow: none;
-    background: #6c757d;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, #8e8e93 0%, #6d6d70 100%);
   }
 }
 
 .buttonLabel {
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.1;
   text-align: center;
   white-space: nowrap;
   text-transform: none;
-  letter-spacing: normal;
+  letter-spacing: 0.025em;
+  opacity: 0.95;
 }
 
-.saveButton {
-  // Inherits from iconButton
-}
 
-.generateButton {
-  // Inherits from iconButton
-}
 
-.downloadButton {
-  // Inherits from iconButton
-}
+
 
 .closeButton {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #c82333 0%, #a02622 100%);
-    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25), 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active:not(:disabled) {
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 }
 

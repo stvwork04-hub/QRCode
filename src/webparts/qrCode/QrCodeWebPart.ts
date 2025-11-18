@@ -28,6 +28,14 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     <section class="${styles.qrCode} ${!!this.context.sdks.microsoftTeams ? styles.teams : ''}">
       <div class="${styles.welcome}">
         <h2>My Digital Business Card</h2>
+        <div class="${styles.profileImageContainer}" id="profileImageContainer">
+          <div class="${styles.profileImagePlaceholder}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+        </div>
       </div>
       <div id="contentContainer">
         <div id="loadingMessage">Loading your information...</div>
@@ -35,6 +43,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     </section>`;
 
     this._loadUserData();
+    this._loadUserProfilePhoto();
   }
 
   private _renderView(): void {
@@ -156,6 +165,52 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       console.error('Error loading data:', error);
       container.innerHTML = `<div style="color: red;">Error loading data: ${error}</div>`;
     }
+  }
+
+  private async _loadUserProfilePhoto(): Promise<void> {
+    setTimeout(async () => {
+      try {
+        const profileImageContainer = this.domElement.querySelector('#profileImageContainer');
+        if (!profileImageContainer) {
+          console.log('Profile image container not found');
+          return;
+        }
+
+        // Get current user's email
+        const email = this.context.pageContext.user.email;
+        console.log('Loading profile photo for:', email);
+        
+        // Create the SharePoint user photo URL
+        const photoUrl = `${this.context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?size=L&username=${encodeURIComponent(email)}`;
+        
+        console.log('Attempting to load photo from:', photoUrl);
+        
+        // Create image element
+        const img = document.createElement('img');
+        img.className = styles.profileImage;
+        img.alt = 'Profile Photo';
+        img.style.display = 'none'; // Hide initially
+        
+        img.onload = () => {
+          console.log('Profile photo loaded successfully');
+          profileImageContainer.innerHTML = '';
+          profileImageContainer.appendChild(img);
+          img.style.display = 'block';
+        };
+        
+        img.onerror = () => {
+          console.log('Profile photo failed to load, keeping placeholder');
+          // Keep the existing placeholder
+        };
+        
+        // Start loading the image
+        img.src = photoUrl;
+        
+      } catch (error) {
+        console.error('Error loading profile photo:', error);
+        // Keep the placeholder on error
+      }
+    }, 1000); // Delay to ensure DOM is ready
   }
 
   private _renderNoRecordMessage(): void {
