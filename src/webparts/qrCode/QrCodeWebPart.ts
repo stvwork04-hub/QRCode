@@ -100,7 +100,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     QrCodeHomeView.renderGeneratePrompt(container);
     QrCodeHomeView.attachGeneratePromptHandlers(
       this.domElement,
-      () => this._generateQRCode()
+      () => this._switchToEditView()
     );
   }
 
@@ -223,15 +223,20 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
   private async _generateQRCode(): Promise<void> {
     if (!this._userItem) return;
 
-    const generateButton = this.domElement.querySelector('#generateButton') as HTMLButtonElement;
+    // Try to find the generate button (could be #generateButton from home or #generateQRButton from edit page)
+    const generateButton = (this.domElement.querySelector('#generateButton') || this.domElement.querySelector('#generateQRButton')) as HTMLButtonElement;
     const saveMessage = this.domElement.querySelector('#saveMessage');
     const successMessage = this.domElement.querySelector('#successMessage') as HTMLElement;
     
-    if (!generateButton || !saveMessage) return;
+    if (!generateButton) return;
 
     try {
       generateButton.disabled = true;
-      saveMessage.innerHTML = '<span style="color: blue;">Requesting QR Code...</span>';
+      
+      // Show loading message
+      if (saveMessage) {
+        saveMessage.innerHTML = '<span style="color: blue;">Requesting QR Code...</span>';
+      }
       
       // Hide success message initially
       if (successMessage) {
@@ -240,7 +245,10 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
 
       await this._qrCodeService.requestQRCodeGeneration(this._userItem.Id);
 
-      saveMessage.innerHTML = '';
+      // Clear loading message
+      if (saveMessage) {
+        saveMessage.innerHTML = '';
+      }
       
       // Show success message below buttons
       if (successMessage) {
@@ -254,7 +262,10 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       
     } catch (error) {
       console.error('Error generating QR Code:', error);
-      saveMessage.innerHTML = `<span style="color: red;">Error requesting QR Code: ${error}</span>`;
+      
+      if (saveMessage) {
+        saveMessage.innerHTML = `<span style="color: red;">Error requesting QR Code: ${error}</span>`;
+      }
       
       // Hide success message on error
       if (successMessage) {

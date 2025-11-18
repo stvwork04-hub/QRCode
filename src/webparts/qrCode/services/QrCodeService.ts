@@ -108,71 +108,84 @@ export class QrCodeService {
 
   public async requestQRCodeGeneration(itemId: number): Promise<boolean> {
     try {
-      console.log('🔧 DEBUG: Starting QR Code generation request');
+      console.log('🔧 DEBUG: Starting QR Code generation request via HTTP endpoint');
       console.log('🔧 DEBUG: Item ID:', itemId);
-      console.log('🔧 DEBUG: Site URL:', QrCodeWebPartConfig.siteUrl);
-      console.log('🔧 DEBUG: List Name:', QrCodeWebPartConfig.listName);
       
-      const updateUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})`;
-      console.log('🔧 DEBUG: Update URL:', updateUrl);
+      // Fetch the item details to get the Name
+      const item = await this.getItemById(itemId);
       
-      const updateData = {
-        GenerateQRCode: true
+      if (!item) {
+        throw new Error('Failed to fetch item details');
+      }
+      
+      const name = `${item.FirstName || ''} ${item.LastName || ''}`.trim();
+      console.log('🔧 DEBUG: User Name:', name);
+      
+      // Power Automate endpoint URL
+      const powerAutomateUrl = 'https://0d8a5cb67bd747f6b7d0905b392268.d1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e015ead33fae4e3fb92520c44abcd344/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=iwE0bpVAv5yngCMksvxC9BGS5kyC6frA8tuIH5Eh3JE';
+      
+      const payload = {
+        ListID: itemId.toString(),
+        Name: name
       };
-      console.log('🔧 DEBUG: Update data:', updateData);
       
-      const bodyString = JSON.stringify(updateData);
-      console.log('🔧 DEBUG: Body string:', bodyString);
-
-      const headers = {
-        'Accept': 'application/json;odata=nometadata',
-        'Content-type': 'application/json;odata=nometadata',
-        'odata-version': '',
-        'IF-MATCH': '*',
-        'X-HTTP-Method': 'MERGE'
-      };
-      console.log('🔧 DEBUG: Headers:', headers);
-
-      console.log('🔧 DEBUG: Making POST request...');
-      const response: SPHttpClientResponse = await this.spHttpClient.post(
-        updateUrl,
-        SPHttpClient.configurations.v1,
-        {
-          headers: headers,
-          body: bodyString
-        }
-      );
-
-      console.log('🔧 DEBUG: Response received');
-      console.log('🔧 DEBUG: Response status:', response.status);
-      console.log('🔧 DEBUG: Response statusText:', response.statusText);
-      console.log('🔧 DEBUG: Response ok:', response.ok);
-
-      if (response.ok) {
-        console.log('✅ SUCCESS: GenerateQRCode field updated successfully!');
-        return true;
-      } else {
-        console.log('❌ ERROR: Response not OK, getting error details...');
-        const errorText = await response.text();
-        console.error('❌ ERROR: Response status:', response.status);
-        console.error('❌ ERROR: Response statusText:', response.statusText);
-        console.error('❌ ERROR: Error details:', errorText);
+      console.log('🔧 DEBUG: Payload:', JSON.stringify(payload, null, 2));
+      console.log('🔧 DEBUG: Power Automate URL:', powerAutomateUrl);
+      
+      try {
+        // Make HTTP POST request to Power Automate endpoint
+        const response = await fetch(powerAutomateUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
         
-        // Try to parse error details
+        console.log('🔧 DEBUG: Response received');
+        console.log('🔧 DEBUG: Response status:', response.status);
+        console.log('🔧 DEBUG: Response statusText:', response.statusText);
+        console.log('🔧 DEBUG: Response ok:', response.ok);
+        
+        // Try to get response body for debugging
+        let responseText = '';
         try {
-          const errorJson = JSON.parse(errorText);
-          console.error('❌ ERROR: Parsed error:', errorJson);
-        } catch (parseError) {
-          console.error('❌ ERROR: Could not parse error JSON');
+          responseText = await response.text();
+          console.log('🔧 DEBUG: Response body:', responseText);
+        } catch (e) {
+          console.log('🔧 DEBUG: Could not read response body');
         }
         
-        throw new Error(`Failed to update GenerateQRCode: ${response.status} ${response.statusText}. Details: ${errorText}`);
+        if (response.ok || response.status === 202) {
+          console.log('✅ SUCCESS: QR Code generation request sent successfully!');
+          return true;
+        } else {
+          console.error('❌ ERROR: Response status:', response.status);
+          console.error('❌ ERROR: Response statusText:', response.statusText);
+          console.error('❌ ERROR: Response body:', responseText);
+          
+          // Provide more helpful error message
+          let errorMessage = `Failed to request QR Code generation: ${response.status} ${response.statusText}`;
+          if (responseText) {
+            try {
+              const errorJson = JSON.parse(responseText);
+              if (errorJson.error && errorJson.error.message) {
+                errorMessage += ` - ${errorJson.error.message}`;
+              }
+            } catch (e) {
+              errorMessage += ` - ${responseText}`;
+            }
+          }
+          
+          throw new Error(errorMessage);
+        }
+      } catch (fetchError) {
+        console.error('💥 FETCH ERROR:', fetchError);
+        throw fetchError;
       }
     } catch (error) {
       console.error('💥 EXCEPTION: Error in requestQRCodeGeneration:', error);
-      console.error('💥 EXCEPTION: Error type:', typeof error);
       console.error('💥 EXCEPTION: Error message:', error.message);
-      console.error('💥 EXCEPTION: Error stack:', error.stack);
       throw error;
     }
   }
