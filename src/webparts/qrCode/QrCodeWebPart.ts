@@ -27,7 +27,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     this.domElement.innerHTML = `
     <section class="${styles.qrCode} ${!!this.context.sdks.microsoftTeams ? styles.teams : ''}">
       <div class="${styles.welcome}">
-        <h2>Your QR Code</h2>
+        <h2>My Digital Business Card</h2>
       </div>
       <div id="contentContainer">
         <div id="loadingMessage">Loading your information...</div>
@@ -170,24 +170,41 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
 
     const generateButton = this.domElement.querySelector('#generateQRButton') as HTMLButtonElement;
     const saveMessage = this.domElement.querySelector('#saveMessage');
+    const successMessage = this.domElement.querySelector('#successMessage') as HTMLElement;
     
     if (!generateButton || !saveMessage) return;
 
     try {
       generateButton.disabled = true;
       saveMessage.innerHTML = '<span style="color: blue;">Requesting QR Code...</span>';
+      
+      // Hide success message initially
+      if (successMessage) {
+        successMessage.style.display = 'none';
+      }
 
       await this._qrCodeService.requestQRCodeGeneration(this._userItem.Id);
 
-      saveMessage.innerHTML = '<span style="color: green;">✓ Thank you, your QR code will be received via email</span>';
+      saveMessage.innerHTML = '';
       
-      // Keep the message visible
-      setTimeout(() => {
-        saveMessage.innerHTML = '';
-      }, 5000);
+      // Show success message below buttons
+      if (successMessage) {
+        successMessage.style.display = 'block';
+        
+        // Hide the message after 8 seconds
+        setTimeout(() => {
+          successMessage.style.display = 'none';
+        }, 8000);
+      }
+      
     } catch (error) {
       console.error('Error generating QR Code:', error);
       saveMessage.innerHTML = `<span style="color: red;">Error requesting QR Code: ${error}</span>`;
+      
+      // Hide success message on error
+      if (successMessage) {
+        successMessage.style.display = 'none';
+      }
     } finally {
       generateButton.disabled = false;
     }

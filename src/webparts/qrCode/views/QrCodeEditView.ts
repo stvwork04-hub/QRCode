@@ -35,17 +35,17 @@ export class QrCodeEditView {
           
           <div class="${styles.formField}">
             <label for="phoneNumber">Phone Number: *</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required />
+            <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
             <label for="mobilePhone">Mobile Phone:</label>
-            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" />
+            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
             <label for="otherPhone">Other Phone:</label>
-            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" />
+            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" pattern="[0-9\\s\\-\\(\\)\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
           </div>
           
           <div class="${styles.formField}">
@@ -79,7 +79,7 @@ export class QrCodeEditView {
                 <rect x="14" y="14" width="7" height="7"></rect>
                 <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
-              <span class="${styles.buttonLabel}">Generate</span>
+              <span class="${styles.buttonLabel}">Generate QR Code</span>
             </button>
             ${hasAttachment ? `
             <button type="button" id="downloadQRButton" class="${styles.iconButton}" title="Download QR Code">
@@ -100,6 +100,12 @@ export class QrCodeEditView {
             </button>
             <span id="saveMessage" style="margin-left: 10px;"></span>
           </div>
+          <div class="${styles.formField}" id="successMessage" style="grid-column: 1 / -1; text-align: center; margin-top: 1rem; padding: 1.25rem 2rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 12px; color: #155724; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: none;">
+            Thank you! Your QR code will be sent to your email shortly.
+          </div>
+          <div class="${styles.formField}" id="saveSuccessMessage" style="grid-column: 1 / -1; text-align: center; margin-top: 1rem; padding: 1.25rem 2rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 12px; color: #155724; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: none;">
+            ✓ Saved successfully!
+          </div>
         </form>
       </div>
     `;
@@ -118,12 +124,11 @@ export class QrCodeEditView {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const saveMessage = domElement.querySelector('#saveMessage');
-      const saveButton = domElement.querySelector('#saveButton') as HTMLButtonElement;
-      
-      if (!saveMessage || !saveButton) return;
+    const saveMessage = domElement.querySelector('#saveMessage');
+    const saveSuccessMessage = domElement.querySelector('#saveSuccessMessage') as HTMLElement;
+    const saveButton = domElement.querySelector('#saveButton') as HTMLButtonElement;
 
-      try {
+    if (!saveMessage || !saveButton || !saveSuccessMessage) return;      try {
         saveButton.disabled = true;
         saveMessage.innerHTML = 'Saving...';
 
@@ -145,9 +150,13 @@ export class QrCodeEditView {
 
         await onSave(formData);
 
-        saveMessage.innerHTML = '<span style="color: green;">✓ Saved successfully!</span>';
+        // Clear any previous messages
+        saveMessage.innerHTML = '';
+        
+        // Show centered success message
+        saveSuccessMessage.style.display = 'block';
         setTimeout(() => {
-          saveMessage.innerHTML = '';
+          saveSuccessMessage.style.display = 'none';
         }, 3000);
       } catch (error) {
         saveMessage.innerHTML = `<span style="color: red;">Error saving: ${error}</span>`;
@@ -172,5 +181,72 @@ export class QrCodeEditView {
     if (downloadQRButton) {
       downloadQRButton.addEventListener('click', onDownload);
     }
+
+    // Add strict numeric-only validation to phone fields
+    const phoneFieldIds = ['phoneNumber', 'mobilePhone', 'otherPhone'];
+    
+    phoneFieldIds.forEach(fieldId => {
+      const field = domElement.querySelector(`#${fieldId}`) as HTMLInputElement;
+      if (field) {
+        // Strict input validation - only allow numbers and basic phone formatting
+        const validatePhoneInput = (input: HTMLInputElement) => {
+          const value = input.value;
+          // Allow only digits, spaces, hyphens, parentheses, and plus sign
+          const filteredValue = value.replace(/[^0-9\s\-\(\)\+]/g, '');
+          if (value !== filteredValue) {
+            input.value = filteredValue;
+            // Trigger change event to update any bound data
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        };
+
+        // Real-time input filtering
+        field.addEventListener('input', () => {
+          validatePhoneInput(field);
+        });
+
+        // Prevent non-numeric key presses
+        field.addEventListener('keypress', (e) => {
+          const char = String.fromCharCode(e.which || e.keyCode);
+          const allowedChars = /[0-9\s\-\(\)\+]/;
+          
+          // Allow control keys (backspace, delete, etc.)
+          if (e.which === 0 || e.which === 8 || e.which === 9 || e.which === 13 || e.which === 27) {
+            return true;
+          }
+          
+          if (!allowedChars.test(char)) {
+            e.preventDefault();
+            return false;
+          }
+        });
+
+        // Handle paste events
+        field.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const clipboardData = e.clipboardData || (window as any).clipboardData;
+          const pastedData = clipboardData.getData('text');
+          const filteredData = pastedData.replace(/[^0-9\s\-\(\)\+]/g, '');
+          
+          // Insert filtered data at cursor position
+          const start = field.selectionStart || 0;
+          const end = field.selectionEnd || 0;
+          const currentValue = field.value;
+          field.value = currentValue.substring(0, start) + filteredData + currentValue.substring(end);
+          
+          // Set cursor position after pasted content
+          const newPosition = start + filteredData.length;
+          field.setSelectionRange(newPosition, newPosition);
+          
+          // Trigger change event
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
+        // Additional validation on blur to ensure clean data
+        field.addEventListener('blur', () => {
+          validatePhoneInput(field);
+        });
+      }
+    });
   }
 }
