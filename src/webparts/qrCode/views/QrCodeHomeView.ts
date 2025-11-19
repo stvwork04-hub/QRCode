@@ -43,14 +43,12 @@ export class QrCodeHomeView {
           </svg>
         </div>
         <p>Would you like to generate your QR Code?</p>
-        <button type="button" id="generateButton" class="${styles.iconButton}" title="Generate QR Code">
+        <button type="button" id="generateButton" class="${styles.iconButton}" title="Verify details and Generate QR Code">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.12 0 4.07.74 5.61 1.98"></path>
           </svg>
-          <span class="${styles.buttonLabel}">Generate QR Code</span>
+          <span class="${styles.buttonLabel}">Verify details and Generate QR Code</span>
         </button>
       </div>
     `;

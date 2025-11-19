@@ -192,7 +192,7 @@ export class QrCodeService {
 
   public async getItemById(itemId: number): Promise<IQRCodeItem | null> {
     try {
-      const url = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})?$select=Id,FirstName,LastName,PhoneNumber,MobilePhone,Instagram,Facebook,Gmail,OtherPhone`;
+      const url = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})?$select=Id,FirstName,LastName,PhoneNumber,MobilePhone,Instagram,Facebook,Gmail,OtherPhone,Company,JobTitle,Email`;
       
       const response: SPHttpClientResponse = await this.spHttpClient.get(
         url,

@@ -138,7 +138,10 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
           if (formData.OtherPhone !== undefined) this._userItem.OtherPhone = formData.OtherPhone;
         },
         () => this._switchToHomeView(),
-        async () => await this._generateQRCode(),
+        async () => {
+          console.log('🚀 DEBUG: Generate QR Code handler called from edit form');
+          return await this._generateQRCode();
+        },
         () => void this._downloadQRCode()
       );
     } catch (error) {
@@ -221,16 +224,31 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
   }
 
   private async _generateQRCode(): Promise<void> {
-    if (!this._userItem) return;
+    console.log('🎯 DEBUG: _generateQRCode method called');
+    
+    if (!this._userItem) {
+      console.log('🎯 ERROR: No user item available');
+      return;
+    }
+
+    console.log('🎯 DEBUG: User item ID:', this._userItem.Id);
 
     // Try to find the generate button (could be #generateButton from home or #generateQRButton from edit page)
     const generateButton = (this.domElement.querySelector('#generateButton') || this.domElement.querySelector('#generateQRButton')) as HTMLButtonElement;
     const saveMessage = this.domElement.querySelector('#saveMessage');
-    const successMessage = this.domElement.querySelector('#successMessage') as HTMLElement;
+    const successMessage = (this.domElement.querySelector('#successMessage') || this.domElement.querySelector('#saveSuccessMessage')) as HTMLElement;
     
-    if (!generateButton) return;
+    console.log('🎯 DEBUG: generateButton found:', !!generateButton);
+    console.log('🎯 DEBUG: saveMessage found:', !!saveMessage);
+    console.log('🎯 DEBUG: successMessage found:', !!successMessage);
+    
+    if (!generateButton) {
+      console.log('🎯 ERROR: Generate button not found');
+      return;
+    }
 
     try {
+      console.log('🎯 DEBUG: Starting QR code generation process');
       generateButton.disabled = true;
       
       // Show loading message
@@ -243,7 +261,9 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
         successMessage.style.display = 'none';
       }
 
+      console.log('🎯 DEBUG: About to call requestQRCodeGeneration with ID:', this._userItem.Id);
       await this._qrCodeService.requestQRCodeGeneration(this._userItem.Id);
+      console.log('🎯 DEBUG: requestQRCodeGeneration completed successfully');
 
       // Clear loading message
       if (saveMessage) {
@@ -252,19 +272,24 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       
       // Show success message below buttons
       if (successMessage) {
+        successMessage.innerHTML = 'QR Code generation requested successfully! Please check your email.';
         successMessage.style.display = 'block';
+        console.log('🎯 DEBUG: Success message displayed');
         
         // Hide the message after 8 seconds
         setTimeout(() => {
           successMessage.style.display = 'none';
+          console.log('🎯 DEBUG: Success message hidden after timeout');
         }, 8000);
       }
       
     } catch (error) {
-      console.error('Error generating QR Code:', error);
+      console.error('💥 ERROR in _generateQRCode:', error);
+      console.error('💥 ERROR type:', typeof error);
+      console.error('💥 ERROR message:', error.message);
       
       if (saveMessage) {
-        saveMessage.innerHTML = `<span style="color: red;">Error requesting QR Code: ${error}</span>`;
+        saveMessage.innerHTML = `<span style="color: red;">Error requesting QR Code: ${error.message || error}</span>`;
       }
       
       // Hide success message on error
@@ -273,6 +298,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       }
     } finally {
       generateButton.disabled = false;
+      console.log('🎯 DEBUG: Generate button re-enabled');
     }
   }
 
