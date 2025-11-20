@@ -10,15 +10,13 @@ export class QrCodeHomeView {
         <div class="${styles.qrCodeImageContainer}">
           <img src="${qrCodeUrl}" alt="QR Code" class="${styles.qrCodeImage}" />
         </div>
-        <h3 class="${styles.personName}">${escape(userItem.FirstName || '')} ${escape(userItem.LastName || '')}</h3>
-        <p class="${styles.personTitle}">${escape(userItem.Title || '')}</p>
         <div class="${styles.homeButtons}">
           <button type="button" id="editButton" class="${styles.iconButton}" title="Edit Details">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-            <span class="${styles.buttonLabel}">Edit</span>
+            <span class="${styles.buttonLabel}">Edit Details</span>
           </button>
           <button type="button" id="downloadQRButtonHome" class="${styles.iconButton}" title="Download QR Code">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -45,14 +43,12 @@ export class QrCodeHomeView {
           </svg>
         </div>
         <p>Would you like to generate your QR Code?</p>
-        <button type="button" id="generateButton" class="${styles.iconButton}" title="Generate QR Code">
+        <button type="button" id="generateButton" class="${styles.iconButton}" title="Verify details and Generate QR Code">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.12 0 4.07.74 5.61 1.98"></path>
           </svg>
-          <span class="${styles.buttonLabel}">Generate QR Code</span>
+          <span class="${styles.buttonLabel}">Verify details and Generate QR Code</span>
         </button>
       </div>
     `;

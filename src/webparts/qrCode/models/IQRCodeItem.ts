@@ -10,4 +10,10 @@ export interface IQRCodeItem {
   QRCodeURL?: string;
   ContactID?: string;
   GenerateQRCode?: boolean;
+  VCardData?: string;
+  MobilePhone?: string;
+  Instagram?: string;
+  Facebook?: string;
+  Gmail?: string;
+  OtherPhone?: string;
 }
