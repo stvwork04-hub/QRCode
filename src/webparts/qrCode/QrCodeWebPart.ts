@@ -322,82 +322,11 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
   private async _downloadCompressedQRCode(attachment: any): Promise<void> {
     try {
       const fileUrl = `https://tecq8.sharepoint.com/${attachment.ServerRelativeUrl}`;
-      
-      // Check if it's an SVG file
-      const isSVG = attachment.FileName.toLowerCase().endsWith('.svg');
-      
-      if (isSVG) {
-        // Handle SVG conversion to PNG
-        await this._convertSVGToPNG(fileUrl);
-      } else {
-        // Handle regular image compression
-        await this._compressImageToPNG(fileUrl);
-      }
-
+      await this._compressImageToPNG(fileUrl);
     } catch (error) {
       console.error('Error processing QR code:', error);
       // Fall back to original download method
       this._qrCodeService.downloadAttachment(attachment);
-    }
-  }
-
-  private async _convertSVGToPNG(svgUrl: string): Promise<void> {
-    try {
-      // Fetch the SVG content
-      const response = await fetch(svgUrl);
-      const svgText = await response.text();
-      
-      // Create a blob from SVG text
-      const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
-      const svgObjectUrl = URL.createObjectURL(svgBlob);
-      
-      // Create image from SVG
-      const img = new Image();
-      
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Failed to load SVG'));
-        img.src = svgObjectUrl;
-      });
-
-      // Create canvas for conversion
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) {
-        throw new Error('Canvas context not available');
-      }
-
-      // Set target size for PNG (400x400 for good quality but smaller file size)
-      const targetSize = 400;
-      canvas.width = targetSize;
-      canvas.height = targetSize;
-      
-      // Set white background for better QR code visibility
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, targetSize, targetSize);
-
-      // Draw SVG image on canvas
-      ctx.drawImage(img, 0, 0, targetSize, targetSize);
-
-      // Convert to PNG blob
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `QR_Code_${this._userItem?.FirstName || 'User'}.png`;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          URL.revokeObjectURL(svgObjectUrl);
-        }
-      }, 'image/png', 0.9); // Higher quality for QR codes
-
-    } catch (error) {
-      throw error;
     }
   }
 

@@ -121,20 +121,19 @@ export class QrCodeService {
       const name = `${item.FirstName || ''} ${item.LastName || ''}`.trim();
       console.log('🔧 DEBUG: User Name:', name);
       
-      // Power Automate endpoint URL
-      const powerAutomateUrl = 'https://0d8a5cb67bd747f6b7d0905b392268.d1.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e015ead33fae4e3fb92520c44abcd344/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=iwE0bpVAv5yngCMksvxC9BGS5kyC6frA8tuIH5Eh3JE';
-      
       const payload = {
         ListID: itemId.toString(),
         Name: name
       };
       
+      console.log('🔧 DEBUG: itemId type:', typeof itemId, 'value:', itemId);
+      console.log('🔧 DEBUG: listIdNumber type:', typeof itemId, 'value:', itemId);
       console.log('🔧 DEBUG: Payload:', JSON.stringify(payload, null, 2));
-      console.log('🔧 DEBUG: Power Automate URL:', powerAutomateUrl);
+      console.log('🔧 DEBUG: Power Automate URL:', QrCodeWebPartConfig.powerAutomateUrl);
       
       try {
         // Make HTTP POST request to Power Automate endpoint
-        const response = await fetch(powerAutomateUrl, {
+        const response = await fetch(QrCodeWebPartConfig.powerAutomateUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
