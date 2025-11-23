@@ -272,7 +272,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       
       // Show success message below buttons
       if (successMessage) {
-        successMessage.innerHTML = 'QR Code generation requested successfully! Please check your email.';
+        successMessage.innerHTML = 'QR Code generation requested successfully! Please close this page to view/download the QR image.';
         successMessage.style.display = 'block';
         console.log('🎯 DEBUG: Success message displayed');
         

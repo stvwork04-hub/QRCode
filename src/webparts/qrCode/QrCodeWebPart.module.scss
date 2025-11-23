@@ -6,7 +6,7 @@
   color: "[theme:bodyText, default: #323130]";
   color: var(--bodyText);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #e0f2f1;
+  background: white;
   min-height: 100vh;
   
   &.teams {
