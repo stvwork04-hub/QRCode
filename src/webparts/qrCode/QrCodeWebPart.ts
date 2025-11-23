@@ -350,17 +350,35 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
         throw new Error('Canvas context not available');
       }
 
-      // Set smaller dimensions for reduced file size
-      const targetSize = 400;
-      canvas.width = targetSize;
-      canvas.height = targetSize;
+      // Calculate proper dimensions maintaining aspect ratio
+      const maxSize = 512; // Higher resolution for better quality
+      let canvasWidth = img.naturalWidth || img.width;
+      let canvasHeight = img.naturalHeight || img.height;
+      
+      // Scale down if too large, maintaining aspect ratio
+      if (canvasWidth > maxSize || canvasHeight > maxSize) {
+        const scale = Math.min(maxSize / canvasWidth, maxSize / canvasHeight);
+        canvasWidth = Math.round(canvasWidth * scale);
+        canvasHeight = Math.round(canvasHeight * scale);
+      }
+      
+      // Ensure minimum size for QR codes
+      const minSize = 256;
+      if (canvasWidth < minSize && canvasHeight < minSize) {
+        const scale = Math.max(minSize / canvasWidth, minSize / canvasHeight);
+        canvasWidth = Math.round(canvasWidth * scale);
+        canvasHeight = Math.round(canvasHeight * scale);
+      }
+      
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
       
       // Set white background
       ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, targetSize, targetSize);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // Draw image on canvas with reduced size
-      ctx.drawImage(img, 0, 0, targetSize, targetSize);
+      // Draw image on canvas maintaining aspect ratio
+      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
       // Convert to PNG blob
       canvas.toBlob((blob) => {
