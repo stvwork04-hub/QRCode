@@ -35,17 +35,25 @@ export class QrCodeEditView {
           
           <div class="${styles.formField}">
             <label for="phoneNumber">Phone Number: *</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape(userItem.PhoneNumber || '')}" required pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <div style="display: flex; align-items: center;">
+              <span style="padding: 8px 12px; background: #f5f5f5; border: 1px solid #ddd; border-right: none; border-radius: 4px 0 0 4px; color: #666;">+965</span>
+              <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape((userItem.PhoneNumber || '').replace(/^\+965\s*/, ''))}" placeholder="12345678" maxlength="8" inputmode="numeric" title="Enter exactly 8 digits" style="border-radius: 0 4px 4px 0; margin: 0;" />
+            </div>
+            <div id="phoneNumberError" style="color: red; font-size: 0.875rem; margin-top: 4px; display: none; font-style: italic;"></div>
           </div>
           
           <div class="${styles.formField}">
             <label for="mobilePhone">Mobile Phone:</label>
-            <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape(userItem.MobilePhone || '')}" pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <div style="display: flex; align-items: center;">
+              <span style="padding: 8px 12px; background: #f5f5f5; border: 1px solid #ddd; border-right: none; border-radius: 4px 0 0 4px; color: #666;">+965</span>
+              <input type="tel" id="mobilePhone" name="mobilePhone" value="${escape((userItem.MobilePhone || '').replace(/^\+965\s*/, ''))}" placeholder="12345678" maxlength="8" inputmode="numeric" title="Enter exactly 8 digits" style="border-radius: 0 4px 4px 0; margin: 0;" />
+            </div>
+            <div id="mobilePhoneError" style="color: red; font-size: 0.875rem; margin-top: 4px; display: none; font-style: italic;"></div>
           </div>
           
           <div class="${styles.formField}">
             <label for="otherPhone">Other Phone:</label>
-            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" pattern="[0-9\\s-()\\+]*" inputmode="numeric" title="Please enter only numbers and phone formatting characters" />
+            <input type="tel" id="otherPhone" name="otherPhone" value="${escape(userItem.OtherPhone || '')}" placeholder="Any phone number" />
           </div>
           
           <div class="${styles.formField}">
@@ -167,14 +175,63 @@ export class QrCodeEditView {
         const gmailInput = domElement.querySelector('#gmail') as HTMLInputElement;
         const otherPhoneInput = domElement.querySelector('#otherPhone') as HTMLInputElement;
 
+        // Validate phone numbers with different rules for each field
+        let hasValidationError = false;
+        const phoneErrorElement = domElement.querySelector('#phoneNumberError') as HTMLElement;
+        const mobileErrorElement = domElement.querySelector('#mobilePhoneError') as HTMLElement;
+        const otherErrorElement = domElement.querySelector('#otherPhoneError') as HTMLElement;
+        
+        // Clear previous errors
+        [phoneErrorElement, mobileErrorElement, otherErrorElement].forEach(el => {
+          if (el) el.style.display = 'none';
+        });
+        
+        // Validate Phone Number (mandatory, exactly 8 digits, +965 prefix added automatically)
+        const phoneValue = phoneNumberInput.value.trim();
+        if (!phoneValue) {
+          if (phoneErrorElement) {
+            phoneErrorElement.textContent = 'Phone Number is mandatory.';
+            phoneErrorElement.style.display = 'block';
+          }
+          hasValidationError = true;
+          phoneNumberInput.focus();
+        } else if (!/^\d{8}$/.test(phoneValue)) {
+          if (phoneErrorElement) {
+            phoneErrorElement.textContent = 'Enter a valid 8 digit number.';
+            phoneErrorElement.style.display = 'block';
+          }
+          hasValidationError = true;
+          phoneNumberInput.focus();
+        }
+        
+        // Validate Mobile Phone (optional, exactly 8 digits if filled, +965 prefix added automatically)
+        const mobileValue = mobilePhoneInput.value.trim();
+        if (mobileValue && !/^\d{8}$/.test(mobileValue)) {
+          if (mobileErrorElement) {
+            mobileErrorElement.textContent = 'Enter a valid 8 digit number.';
+            mobileErrorElement.style.display = 'block';
+          }
+          hasValidationError = true;
+          if (!hasValidationError) mobilePhoneInput.focus();
+        }
+        
+        // Other Phone field has no validation
+        
+        if (hasValidationError) {
+          saveButton.disabled = false;
+          return;
+        }
+
         const formData = {
-          PhoneNumber: phoneNumberInput.value,
-          MobilePhone: mobilePhoneInput.value || undefined,
+          PhoneNumber: phoneNumberInput.value ? `+965 ${phoneNumberInput.value}` : '',
+          MobilePhone: mobilePhoneInput.value ? `+965 ${mobilePhoneInput.value}` : '',
           Instagram: instagramInput.value || undefined,
           Facebook: facebookInput.value || undefined,
           Gmail: gmailInput.value || undefined,
           OtherPhone: otherPhoneInput.value || undefined
         };
+        
+        console.log('🔧 DEBUG: Form data being saved:', formData);
 
         await onSave(formData);
 
@@ -221,8 +278,41 @@ export class QrCodeEditView {
       downloadQRButton.addEventListener('click', onDownload);
     }
 
-    // Add strict numeric-only validation to phone fields
-    const phoneFieldIds = ['phoneNumber', 'mobilePhone', 'otherPhone'];
+    // Add validation to phone fields
+    const phoneFieldIds = ['phoneNumber', 'mobilePhone'];
+    const otherPhoneField = domElement.querySelector('#otherPhone') as HTMLInputElement;
+    
+    // Other Phone field - allow only digits and special characters, no alphabets
+    if (otherPhoneField) {
+      otherPhoneField.addEventListener('input', () => {
+        const value = otherPhoneField.value;
+        // Remove any alphabetic characters (a-z, A-Z), keep digits and special characters
+        const cleanValue = value.replace(/[a-zA-Z]/g, '');
+        
+        if (value !== cleanValue) {
+          const cursorPos = otherPhoneField.selectionStart || 0;
+          otherPhoneField.value = cleanValue;
+          // Try to maintain cursor position
+          setTimeout(() => {
+            otherPhoneField.setSelectionRange(Math.min(cursorPos, cleanValue.length), Math.min(cursorPos, cleanValue.length));
+          }, 0);
+        }
+      });
+      
+      // Also prevent alphabetic input on keypress
+      otherPhoneField.addEventListener('keypress', (e) => {
+        // Allow control keys
+        if (e.ctrlKey || e.metaKey) {
+          return;
+        }
+        
+        const char = e.key;
+        // Block alphabetic characters
+        if (/[a-zA-Z]/.test(char)) {
+          e.preventDefault();
+        }
+      });
+    }
     
     phoneFieldIds.forEach(fieldId => {
       const field = domElement.querySelector(`#${fieldId}`) as HTMLInputElement;
@@ -263,7 +353,8 @@ export class QrCodeEditView {
         // Handle paste events
         field.addEventListener('paste', (e) => {
           e.preventDefault();
-          const clipboardData = e.clipboardData || (window as any).clipboardData;
+          const clipboardData = e.clipboardData || (window as Window & { clipboardData?: DataTransfer }).clipboardData;
+          if (!clipboardData) return;
           const pastedData = clipboardData.getData('text');
           const filteredData = pastedData.replace(/[^0-9\s-()+]/g, '');
           

@@ -80,9 +80,11 @@ export class QrCodeService {
 
   public async updateItem(itemId: number, updatedFields: Partial<IQRCodeItem>): Promise<boolean> {
     try {
+      console.log('🔧 DEBUG: updateItem called with:', { itemId, updatedFields });
       const updateUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})`;
       
       const body = JSON.stringify(updatedFields);
+      console.log('🔧 DEBUG: Request body:', body);
 
       const response: SPHttpClientResponse = await this.spHttpClient.post(
         updateUrl,
@@ -285,6 +287,8 @@ export class QrCodeService {
     
     return vCard;
   }
+
+
 
   public downloadAttachment(attachment: any): void {
     const fileUrl = `https://tecq8.sharepoint.com/${attachment.ServerRelativeUrl}`;
