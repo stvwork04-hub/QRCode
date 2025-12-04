@@ -42,15 +42,15 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       </div>
     </section>`;
 
-    this._loadUserData();
-    this._loadUserProfilePhoto();
+    this._loadUserData().catch(console.error);
+    this._loadUserProfilePhoto().catch(console.error);
   }
 
   private _renderView(): void {
     if (this._currentView === 'home') {
       this._renderHomePage();
     } else {
-      this._renderEditPage();
+      this._renderEditPage().catch(console.error);
     }
   }
 
@@ -58,7 +58,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     const container = this.domElement.querySelector('#contentContainer');
     if (!container || !this._userItem) return;
 
-    void this._checkForAttachment();
+    this._checkForAttachment().catch(console.error);
   }
 
   private async _checkForAttachment(): Promise<void> {
@@ -89,7 +89,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     QrCodeHomeView.attachHomePageHandlers(
       this.domElement,
       () => this._switchToEditView(),
-      () => void this._downloadQRCode()
+      () => { this._downloadQRCode().catch(console.error); }
     );
   }
 
@@ -131,7 +131,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
           
           // Update the local user item with the new data
           this._userItem.PhoneNumber = formData.PhoneNumber;
-          if (formData.MobilePhone !== undefined) this._userItem.MobilePhone = formData.MobilePhone;
+          this._userItem.MobilePhone = formData.MobilePhone;
           if (formData.Instagram !== undefined) this._userItem.Instagram = formData.Instagram;
           if (formData.Facebook !== undefined) this._userItem.Facebook = formData.Facebook;
           if (formData.Gmail !== undefined) this._userItem.Gmail = formData.Gmail;
@@ -142,7 +142,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
           console.log('🚀 DEBUG: Generate QR Code handler called from edit form');
           return await this._generateQRCode();
         },
-        () => void this._downloadQRCode()
+        () => { this._downloadQRCode().catch(console.error); }
       );
     } catch (error) {
       console.error('Error rendering edit page:', error);
@@ -272,7 +272,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
       
       // Show success message below buttons
       if (successMessage) {
-        successMessage.innerHTML = 'QR Code generation requested successfully! Please check your email.';
+        successMessage.innerHTML = 'QR Code generation requested successfully! Please close this page to view/download the QR image.';
         successMessage.style.display = 'block';
         console.log('🎯 DEBUG: Success message displayed');
         
@@ -319,7 +319,7 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     }
   }
 
-  private async _downloadCompressedQRCode(attachment: any): Promise<void> {
+  private async _downloadCompressedQRCode(attachment: { ServerRelativeUrl: string; FileName: string }): Promise<void> {
     try {
       const fileUrl = `https://tecq8.sharepoint.com/${attachment.ServerRelativeUrl}`;
       await this._compressImageToPNG(fileUrl);
@@ -331,16 +331,15 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
   }
 
   private async _compressImageToPNG(imageUrl: string): Promise<void> {
-    try {
-      // Create a new image to load the QR code
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Failed to load image'));
-        img.src = imageUrl;
-      });
+    // Create a new image to load the QR code
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = imageUrl;
+    });
 
       // Create canvas for compression
       const canvas = document.createElement('canvas');
@@ -350,17 +349,35 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
         throw new Error('Canvas context not available');
       }
 
-      // Set smaller dimensions for reduced file size
-      const targetSize = 400;
-      canvas.width = targetSize;
-      canvas.height = targetSize;
+      // Calculate proper dimensions maintaining aspect ratio
+      const maxSize = 512; // Higher resolution for better quality
+      let canvasWidth = img.naturalWidth || img.width;
+      let canvasHeight = img.naturalHeight || img.height;
+      
+      // Scale down if too large, maintaining aspect ratio
+      if (canvasWidth > maxSize || canvasHeight > maxSize) {
+        const scale = Math.min(maxSize / canvasWidth, maxSize / canvasHeight);
+        canvasWidth = Math.round(canvasWidth * scale);
+        canvasHeight = Math.round(canvasHeight * scale);
+      }
+      
+      // Ensure minimum size for QR codes
+      const minSize = 256;
+      if (canvasWidth < minSize && canvasHeight < minSize) {
+        const scale = Math.max(minSize / canvasWidth, minSize / canvasHeight);
+        canvasWidth = Math.round(canvasWidth * scale);
+        canvasHeight = Math.round(canvasHeight * scale);
+      }
+      
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
       
       // Set white background
       ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, targetSize, targetSize);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // Draw image on canvas with reduced size
-      ctx.drawImage(img, 0, 0, targetSize, targetSize);
+      // Draw image on canvas maintaining aspect ratio
+      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
       // Convert to PNG blob
       canvas.toBlob((blob) => {
@@ -376,10 +393,6 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
           URL.revokeObjectURL(url);
         }
       }, 'image/png', 0.9);
-
-    } catch (error) {
-      throw error;
-    }
   }
 
   protected onInit(): Promise<void> {

@@ -58,7 +58,7 @@ export class QrCodeHomeView {
     container.innerHTML = `
       <div class="${styles.noRecord}">
         <p>No record found for your email: <strong>${escape(email)}</strong></p>
-        <p>Please contact your administrator to create a record for you in the DigitalBusinessCards list.</p>
+        <p>Please contact your TECPoint administrator to create a record for you in the DigitalBusinessCards list.</p>
       </div>
     `;
   }
