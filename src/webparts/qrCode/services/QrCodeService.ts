@@ -124,8 +124,7 @@ export class QrCodeService {
       console.log('🔧 DEBUG: User Name:', name);
       
       const payload = {
-        ListID: itemId.toString(),
-        Name: name
+        ListID: itemId.toString()
       };
       
       console.log('🔧 DEBUG: itemId type:', typeof itemId, 'value:', itemId);
