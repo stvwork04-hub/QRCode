@@ -567,3 +567,74 @@ input[readonly]:not([type="tel"]) {
   color: #6c757d !important;
   font-style: normal !important;
 }
+
+// Public business card styles
+.publicBusinessCard {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.cardHeader {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  
+  h1 {
+    color: #1e293b;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.cardContent {
+  padding: 2rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  
+  strong {
+    min-width: 100px;
+    color: #374151;
+    font-weight: 600;
+  }
+  
+  span {
+    color: #1f2937;
+  }
+}
+
+.cardActions {
+  padding: 1rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.saveContactButton {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+}
