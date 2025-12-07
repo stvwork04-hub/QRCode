@@ -9,7 +9,7 @@ export class QrCodeService {
     this.spHttpClient = spHttpClient;
   }
 
-  public async getUserItem(email: string): Promise<IQRCodeItem | null> {
+  public async getUserItem(email: string): Promise<IQRCodeItem | undefined> {
     try {
       // Try exact match first (case-sensitive)
       let listUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items?$filter=Email eq '${encodeURIComponent(email)}'&$select=Id,Title,FirstName,LastName,Email,PhoneNumber,Company,JobTitle,MobilePhone,Instagram,Facebook,Gmail,OtherPhone,AttachmentFiles&$expand=AttachmentFiles`;
@@ -41,7 +41,7 @@ export class QrCodeService {
         
         if (data.value && data.value.length > 0) {
           // Filter client-side with case-insensitive comparison
-          const matchedItem = data.value.find((item: any) => 
+          const matchedItem = data.value.find((item: { Email?: string }) => 
             item.Email && item.Email.toLowerCase() === email.toLowerCase()
           );
           
@@ -54,14 +54,14 @@ export class QrCodeService {
         return data.value[0];
       }
       
-      return null;
+      return undefined;
     } catch (error) {
       console.error('Error loading data:', error);
       throw error;
     }
   }
 
-  public async getAttachments(itemId: number): Promise<any[]> {
+  public async getAttachments(itemId: number): Promise<{ FileName: string; ServerRelativeUrl: string }[]> {
     try {
       const attachmentsUrl = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})/AttachmentFiles`;
       
@@ -152,7 +152,7 @@ export class QrCodeService {
         try {
           responseText = await response.text();
           console.log('🔧 DEBUG: Response body:', responseText);
-        } catch (e) {
+        } catch {
           console.log('🔧 DEBUG: Could not read response body');
         }
         
@@ -172,7 +172,7 @@ export class QrCodeService {
               if (errorJson.error && errorJson.error.message) {
                 errorMessage += ` - ${errorJson.error.message}`;
               }
-            } catch (e) {
+            } catch {
               errorMessage += ` - ${responseText}`;
             }
           }
@@ -190,7 +190,7 @@ export class QrCodeService {
     }
   }
 
-  public async getItemById(itemId: number): Promise<IQRCodeItem | null> {
+  public async getItemById(itemId: number): Promise<IQRCodeItem | undefined> {
     try {
       const url = `${QrCodeWebPartConfig.siteUrl}/_api/web/lists/getbytitle('${QrCodeWebPartConfig.listName}')/items(${itemId})?$select=Id,FirstName,LastName,PhoneNumber,MobilePhone,Instagram,Facebook,Gmail,OtherPhone,Company,JobTitle,Email`;
       
@@ -203,7 +203,7 @@ export class QrCodeService {
         const data = await response.json();
         return data;
       }
-      return null;
+      return undefined;
     } catch (error) {
       console.error('Error fetching item by ID:', error);
       throw error;
@@ -289,7 +289,7 @@ export class QrCodeService {
 
 
 
-  public downloadAttachment(attachment: any): void {
+  public downloadAttachment(attachment: { FileName: string; ServerRelativeUrl: string }): void {
     const fileUrl = `https://tecq8.sharepoint.com/${attachment.ServerRelativeUrl}`;
     console.log('Downloading file from:', fileUrl);
     

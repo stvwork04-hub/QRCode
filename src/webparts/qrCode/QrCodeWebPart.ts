@@ -19,7 +19,7 @@ export interface IQrCodeWebPartProps {
 export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartProps> {
 
   private _currentUserEmail: string = '';
-  private _userItem: IQRCodeItem | null = null;
+  private _userItem: IQRCodeItem | undefined = undefined;
   private _currentView: 'home' | 'edit' = 'home';
   private _qrCodeService: QrCodeService;
 
@@ -27,7 +27,6 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
     this.domElement.innerHTML = `
     <section class="${styles.qrCode} ${!!this.context.sdks.microsoftTeams ? styles.teams : ''}">
       <div class="${styles.welcome}">
-        <h2>My Digital Business Card</h2>
         <div class="${styles.profileImageContainer}" id="profileImageContainer">
           <div class="${styles.profileImagePlaceholder}">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -127,6 +126,11 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
         this.domElement,
         async (formData) => {
           if (!this._userItem) return;
+          
+          console.log('🔧 DEBUG: Save and Generate QR Code - Starting...');
+          
+          // Step 1: Save the data to SharePoint
+          console.log('🔧 DEBUG: Step 1 - Saving data to SharePoint');
           await this._qrCodeService.updateItem(this._userItem.Id, formData);
           
           // Update the local user item with the new data
@@ -136,13 +140,15 @@ export default class QrCodeWebPart extends BaseClientSideWebPart<IQrCodeWebPartP
           if (formData.Facebook !== undefined) this._userItem.Facebook = formData.Facebook;
           if (formData.Gmail !== undefined) this._userItem.Gmail = formData.Gmail;
           if (formData.OtherPhone !== undefined) this._userItem.OtherPhone = formData.OtherPhone;
+          
+          console.log('🔧 DEBUG: Step 2 - Data saved, now generating QR Code');
+          
+          // Step 2: Generate QR Code
+          await this._generateQRCode();
+          
+          console.log('🔧 DEBUG: Save and Generate QR Code - Complete!');
         },
-        () => this._switchToHomeView(),
-        async () => {
-          console.log('🚀 DEBUG: Generate QR Code handler called from edit form');
-          return await this._generateQRCode();
-        },
-        () => { this._downloadQRCode().catch(console.error); }
+        () => this._switchToHomeView()
       );
     } catch (error) {
       console.error('Error rendering edit page:', error);

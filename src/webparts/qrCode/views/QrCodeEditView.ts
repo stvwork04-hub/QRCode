@@ -7,6 +7,7 @@ export class QrCodeEditView {
   public static renderForm(container: Element, userItem: IQRCodeItem, hasAttachment: boolean): void {
     container.innerHTML = `
       <div class="${styles.formContainer}">
+        <h2 style="text-align: center; margin-top: 0; margin-bottom: 2.5rem; color: maroon;">My Digital Business Card Details</h2>
         <form id="qrCodeForm">
           <div class="${styles.formField}">
             <label for="firstName">First Name:</label>
@@ -100,15 +101,7 @@ export class QrCodeEditView {
           </div>
           
           <div class="${styles.formField} ${styles.buttonGroup}">
-            <button type="submit" id="saveButton" class="${styles.iconButton}" title="Save">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
-              <span class="${styles.buttonLabel}">Save</span>
-            </button>
-            <button type="button" id="generateQRButton" class="${styles.iconButton}" title="Generate QR Code">
+            <button type="submit" id="generateQRButton" class="${styles.iconButton}" title="Save & Generate QR Code">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
@@ -117,16 +110,6 @@ export class QrCodeEditView {
               </svg>
               <span class="${styles.buttonLabel}">Generate QR Code</span>
             </button>
-            ${hasAttachment ? `
-            <button type="button" id="downloadQRButton" class="${styles.iconButton}" title="Download QR Code">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span class="${styles.buttonLabel}">Download</span>
-            </button>
-            ` : ''}
             <button type="button" id="closeButton" class="${styles.iconButton}" title="Close">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -134,13 +117,10 @@ export class QrCodeEditView {
               </svg>
               <span class="${styles.buttonLabel}">Close</span>
             </button>
-            <span id="saveMessage" style="margin-left: 10px;"></span>
+            <span id="generateMessage" style="margin-left: 10px;"></span>
           </div>
           <div class="${styles.formField}" id="successMessage" style="grid-column: 1 / -1; text-align: center; margin-top: 1rem; padding: 1.25rem 2rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 12px; color: #155724; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: none;">
-            Thank you! Your QR code will be sent to your email shortly.
-          </div>
-          <div class="${styles.formField}" id="saveSuccessMessage" style="grid-column: 1 / -1; text-align: center; margin-top: 1rem; padding: 1.25rem 2rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 12px; color: #155724; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: none;">
-            ✓ Saved successfully!
+            ✅ Data saved and QR code generated! Check your email shortly.
           </div>
         </form>
       </div>
@@ -149,10 +129,8 @@ export class QrCodeEditView {
 
   public static attachFormHandlers(
     domElement: HTMLElement,
-    onSave: (formData: { PhoneNumber: string; MobilePhone?: string; Instagram?: string; Facebook?: string; Gmail?: string; OtherPhone?: string; }) => Promise<void>,
-    onClose: () => void,
-    onGenerate: () => Promise<void>,
-    onDownload: () => void
+    onSaveAndGenerate: (formData: { PhoneNumber: string; MobilePhone?: string; Instagram?: string; Facebook?: string; Gmail?: string; OtherPhone?: string; }) => Promise<void>,
+    onClose: () => void
   ): void {
     const form = domElement.querySelector('#qrCodeForm') as HTMLFormElement;
     if (!form) return;
@@ -160,13 +138,15 @@ export class QrCodeEditView {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-    const saveMessage = domElement.querySelector('#saveMessage');
-    const saveSuccessMessage = domElement.querySelector('#saveSuccessMessage') as HTMLElement;
-    const saveButton = domElement.querySelector('#saveButton') as HTMLButtonElement;
+      const generateMessage = domElement.querySelector('#generateMessage');
+      const successMessage = domElement.querySelector('#successMessage') as HTMLElement;
+      const generateButton = domElement.querySelector('#generateQRButton') as HTMLButtonElement;
 
-    if (!saveMessage || !saveButton || !saveSuccessMessage) return;      try {
-        saveButton.disabled = true;
-        saveMessage.innerHTML = 'Saving...';
+      if (!generateMessage || !generateButton || !successMessage) return;
+      
+      try {
+        generateButton.disabled = true;
+        generateMessage.innerHTML = 'Saving and generating QR code...';
 
         const phoneNumberInput = domElement.querySelector('#phoneNumber') as HTMLInputElement;
         const mobilePhoneInput = domElement.querySelector('#mobilePhone') as HTMLInputElement;
@@ -218,7 +198,8 @@ export class QrCodeEditView {
         // Other Phone field has no validation
         
         if (hasValidationError) {
-          saveButton.disabled = false;
+          generateButton.disabled = false;
+          generateMessage.innerHTML = '';
           return;
         }
 
@@ -231,23 +212,27 @@ export class QrCodeEditView {
           OtherPhone: otherPhoneInput.value || undefined
         };
         
-        console.log('🔧 DEBUG: Form data being saved:', formData);
+        console.log('🔧 DEBUG: Form data being saved and QR code being generated:', formData);
 
-        await onSave(formData);
+        // Call the combined save and generate function
+        await onSaveAndGenerate(formData);
 
         // Clear any previous messages
-        saveMessage.innerHTML = '';
+        generateMessage.innerHTML = '';
         
         // Show centered success message
-        const messageElement = saveSuccessMessage;
-        messageElement.style.display = 'block';
-        setTimeout(() => {
-          messageElement.style.display = 'none';
-        }, 3000);
+        if (successMessage) {
+          successMessage.style.display = 'block';
+          setTimeout(() => {
+            if (successMessage) {
+              successMessage.style.display = 'none';
+            }
+          }, 5000);
+        }
       } catch (error) {
-        saveMessage.innerHTML = `<span style="color: red;">Error saving: ${error}</span>`;
+        generateMessage.innerHTML = `<span style="color: red;">Error: ${error}</span>`;
       } finally {
-        saveButton.disabled = false;
+        generateButton.disabled = false;
       }
     });
 
@@ -256,27 +241,7 @@ export class QrCodeEditView {
       closeButton.addEventListener('click', onClose);
     }
 
-    const generateQRButton = domElement.querySelector('#generateQRButton');
-    if (generateQRButton) {
-      console.log('🔥 DEBUG: Generate QR Code button found and event listener being attached');
-      generateQRButton.addEventListener('click', (event) => {
-        console.log('🔥 DEBUG: Generate QR Code button CLICKED!');
-        console.log('🔥 DEBUG: Event:', event);
-        event.preventDefault();
-        event.stopPropagation();
-        console.log('🔥 DEBUG: About to call onGenerate function');
-        onGenerate().catch((error) => {
-          console.error('🔥 ERROR: onGenerate failed:', error);
-        });
-      });
-    } else {
-      console.log('🔥 ERROR: Generate QR Code button NOT found in DOM');
-    }
-
-    const downloadQRButton = domElement.querySelector('#downloadQRButton');
-    if (downloadQRButton) {
-      downloadQRButton.addEventListener('click', onDownload);
-    }
+    // Note: Generate QR Button is now handled by the form submit event above
 
     // Add validation to phone fields
     const phoneFieldIds = ['phoneNumber', 'mobilePhone'];
