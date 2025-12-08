@@ -35,7 +35,7 @@ export class QrCodeEditView {
           </div>
           
           <div class="${styles.formField}">
-            <label for="phoneNumber">Phone Number: *</label>
+              <label for="phoneNumber">Work Phone <span style="color: red;">*</span>:</label>
             <div style="display: flex; align-items: center;">
               <span style="padding: 8px 12px; background: #f5f5f5; border: 1px solid #ddd; border-right: none; border-radius: 4px 0 0 4px; color: #666;">+965</span>
               <input type="tel" id="phoneNumber" name="phoneNumber" value="${escape((userItem.PhoneNumber || '').replace(/^\+965\s*/, ''))}" placeholder="12345678" maxlength="8" inputmode="numeric" title="Enter exactly 8 digits" style="border-radius: 0 4px 4px 0; margin: 0;" />
@@ -167,10 +167,10 @@ export class QrCodeEditView {
         });
         
         // Validate Phone Number (mandatory, exactly 8 digits, +965 prefix added automatically)
-        const phoneValue = phoneNumberInput.value.trim();
-        if (!phoneValue) {
-          if (phoneErrorElement) {
-            phoneErrorElement.textContent = 'Phone Number is mandatory.';
+          const phoneValue = phoneNumberInput.value.trim();
+          if (!phoneValue) {
+            if (phoneErrorElement) {
+              phoneErrorElement.textContent = 'Work Phone is mandatory.';
             phoneErrorElement.style.display = 'block';
           }
           hasValidationError = true;
@@ -206,10 +206,10 @@ export class QrCodeEditView {
         const formData = {
           PhoneNumber: phoneNumberInput.value ? `+965 ${phoneNumberInput.value}` : '',
           MobilePhone: mobilePhoneInput.value ? `+965 ${mobilePhoneInput.value}` : '',
-          Instagram: instagramInput.value || undefined,
-          Facebook: facebookInput.value || undefined,
-          Gmail: gmailInput.value || undefined,
-          OtherPhone: otherPhoneInput.value || undefined
+          Instagram: instagramInput.value || '',
+          Facebook: facebookInput.value || '',
+          Gmail: gmailInput.value || '',
+          OtherPhone: otherPhoneInput.value || ''
         };
         
         console.log('🔧 DEBUG: Form data being saved and QR code being generated:', formData);
